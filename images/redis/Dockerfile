@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:xenail
+FROM ubuntu:xenial
 
 # Install Redis.
 RUN \

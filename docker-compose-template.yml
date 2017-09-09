@@ -50,3 +50,12 @@ services:
         cap_add:
             - SYS_PTRACE
         command: ["/root/bootstrap.sh", "mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci"]
+
+    redis:
+        image: crevillo/redis
+        hostname: ${DOCKER_PROJECT_NAME}_redis
+        container_name: redis
+        ports:
+            - "6380:6379"
+        cap_add:
+            - SYS_PTRACE
