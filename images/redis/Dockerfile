@@ -12,7 +12,8 @@ RUN \
   make && \
   make install && \
   mkdir /etc/redis && \
-  cp /tmp/redis-stable/redis.conf /etc/redis
+  cp /tmp/redis-stable/redis.conf /etc/redis && \
+  mkdir /var/lib/redis
 
 RUN sed -i -e"s/supervised no/supervised systemd/g" /etc/redis/redis.conf && \
   sed -i -e"s/dir .\//dir \/var\/lib\/redis/g" /etc/redis/redis.conf

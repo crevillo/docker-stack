@@ -8,12 +8,29 @@
 # Keeping a separate container name for each project allows to run many container platforms in parallel
 version: '2'
 services:
+    web:
+        extends:
+            file: ${DOCKER_WEB_SERVER}.yml
+            service: ${DOCKER_WEB_SERVER}
+        hostname: ${DOCKER_PROJECT_NAME}_web
+        container_name: web
+        ports:
+            - "82:82"
+            - "88:88"
+        volumes:
+            - "$DOCKER_WWW_ROOT:$DOCKER_WWW_DEST"
+        env_file:
+            - docker-compose.env
+            - docker-compose.env.local
+        cap_add:
+            - SYS_PTRACE
     front1:
         image: crevillo/front
-        hostname: ${DOCKER_PROJECT_NAME}_front1
+        hostname: front1.${DOCKER_PROJECT_NAME}.cloud
         container_name: front1
         privileged: true
         volumes:
+            - "$DOCKER_WWW_ROOT:$DOCKER_WWW_DEST"
             - ./logs/cli:/var/log/php
             # files in /tmp/cron.d get managed by bootstrap.sh
             - ./config/cli/cron.d:/tmp/cron.d
@@ -22,8 +39,28 @@ services:
             - "$SSH_AUTH_SOCK:/ssh-agent"
             - "./config/cli/php5/custom_vars.ini:$DOCKER_PHP_CONF_PATH/cli/conf.d/custom_vars.ini"
             - "./config/cli/php5/timezone.ini:$DOCKER_PHP_CONF_PATH/cli/conf.d/timezone.ini"
+        environment:
+            - SSH_AUTH_SOCK=/ssh-agent
+        env_file:
+            - docker-compose.env
+            - docker-compose.env.local
+        cap_add:
+            - SYS_PTRACE
+    back1:
+        image: crevillo/back
+        hostname: back1.${DOCKER_PROJECT_NAME}.cloud
+        container_name: back1
+        privileged: true
+        volumes:
             - "$DOCKER_WWW_ROOT:$DOCKER_WWW_DEST"
-            - "$DOCKER_STORAGE_LOCAL_PATH:$DOCKER_STORAGE_MOUNT_POINT"
+            - ./logs/cli:/var/log/php
+            # files in /tmp/cron.d get managed by bootstrap.sh
+            - ./config/cli/cron.d:/tmp/cron.d
+            - ~/.gitconfig:/home/site/.gitconfig
+            - ~/.ssh/config:/home/site/.ssh/config
+            - "$SSH_AUTH_SOCK:/ssh-agent"
+            - "./config/cli/php5/custom_vars.ini:$DOCKER_PHP_CONF_PATH/cli/conf.d/custom_vars.ini"
+            - "./config/cli/php5/timezone.ini:$DOCKER_PHP_CONF_PATH/cli/conf.d/timezone.ini"
         environment:
             - SSH_AUTH_SOCK=/ssh-agent
         env_file:
@@ -32,10 +69,10 @@ services:
         cap_add:
             - SYS_PTRACE
 
-    mysql:
+    db:
         image: klabs/mysql
-        hostname: ${DOCKER_PROJECT_NAME}_mysql
-        container_name: mysql
+        hostname: db.${DOCKER_PROJECT_NAME}.cloud
+        container_name: db
         # nb: this prevents the image to start on some ubuntu installs because of apparmor config...
         #privileged: true
         ports:
@@ -53,9 +90,9 @@ services:
 
     redis:
         image: crevillo/redis
-        hostname: ${DOCKER_PROJECT_NAME}_redis
+        hostname: redis.${DOCKER_PROJECT_NAME}.cloud
         container_name: redis
         ports:
-            - "6380:6379"
+            - "6379:6379"
         cap_add:
             - SYS_PTRACE

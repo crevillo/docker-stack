@@ -127,12 +127,13 @@ checkRequiredFiles() {
 buildDockerComposeConfigFileIfNeeded() {
     if [ ! -f "$DOCKER_COMPOSE_CONFIG_FILE" ]; then
 
-        echo "Generating config file $DOCKER_COMPOSE_CONFIG_FILE ...";
+        echo "Generando fichero de configuración $DOCKER_COMPOSE_CONFIG_FILE ...";
 
-        DOCKER_PROJECT_NAME=movistar_originales
+        read -p "[?] Cómo se llama el proyecto? " DOCKER_PROJECT_NAME
+        DOCKER_PROJECT_NAME=${DOCKER_PROJECT_NAME:-myproject}
 
         # Multi site stack
-        read -p "[?] En qué carpeta están los archivos del proyecto? [/home/$(whoami)/www]: " www_root
+        read -p "[?] Dónde tienes los archivos? [/home/$(whoami)/www]: " www_root
         www_root=${www_root:-/home/$(whoami)/www}
 
         if [ ! -d "$www_root" ]; then
@@ -161,7 +162,6 @@ buildDockerComposeConfigFileIfNeeded() {
         echo "export DOCKER_WWW_DEST=$www_dest" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_PROJECT_NAME=$DOCKER_PROJECT_NAME" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_VARNISH_VCL_FILE=$vcl_filepath" >> $DOCKER_COMPOSE_CONFIG_FILE
-
         #Configure PHP version
         configurePhpVersion
         configureWebServer
