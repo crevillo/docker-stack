@@ -13,8 +13,10 @@ The main software packages installed are:
 ## Nginx config
 
 Nginx listens on ports:
-* 80 (dev vhost)
-* 81 (demo vhost)
+* 80
+
+Varnish listens on ports:
+* 6081
 
 Those can be remapped when running the container.
 
