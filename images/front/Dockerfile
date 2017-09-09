@@ -10,7 +10,7 @@ LABEL varnish.version=5 \
 ENV TERM xterm-color
 
 ARG DOCKER_TIMEZONE=Europe/Madrid
-ARG project_name
+ARG PROJECT_NAME
 
 # Base packages
 # -----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ COPY bootstrap.sh /root/bootstrap.sj
 RUN chmod 755 /root/bootstrap.sh
 
 # create site vhost
-COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$project_name
+COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$PROJECT_NAME
 COPY etc/nginx/sites-enabled/proxy_back /etc/nginx/sites-enabled/proxy_back
 
 # Clear archives in apt cache folder
