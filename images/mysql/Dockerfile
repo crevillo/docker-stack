@@ -1,8 +1,8 @@
-FROM mysql:5.6
-MAINTAINER Kaliop
-LABEL mysql.version=5.6
+FROM mysql:5.7
+MAINTAINER The Cocktail
+LABEL mysql.version=5.7
 
-ARG DOCKER_TIMEZONE=Europe/Paris
+ARG DOCKER_TIMEZONE=Europe/Madrid
 
 # Configure timezone
 # -----------------------------------------------------------------------------
