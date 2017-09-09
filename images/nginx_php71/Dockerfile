@@ -91,7 +91,7 @@ RUN chmod 755 /root/bootstrap.sh
 
 EXPOSE 443
 EXPOSE 80
-EXPOSE 82
+EXPOSE 81
 
 WORKDIR /var/www/
 
