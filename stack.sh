@@ -12,8 +12,8 @@ DOCKER_COMPOSE_FILE=${COMPOSE_FILE:=docker-compose.yml}
 DOCKER_COMPOSE_CONFIG_FILE=${DOCKER_COMPOSE_CONFIG_FILE:=docker-compose.config.sh}
 
 
-php_available_versions=(5.4 5.6 7 7.1)
-available_web_servers=(nginx apache)
+php_available_versions=(7.1)
+available_web_servers=(nginx)
 
 usage() {
     echo "Usage: ./stack.sh start|stop|rm|php_switch|web_server_switch|purgelogs|update|reset"
@@ -52,8 +52,7 @@ buildDockerComposeLocalEnvFileIfNeeded() {
 }
 
 configurePhpVersion() {
-    read -p "[?] Which PHP version do you want to use? 5.4, [5.6], 7 or 7.1: " php_version
-    php_version=${php_version:-5.6}
+    php_version=7.1
 
     if [[ ! " ${php_available_versions[@]} " =~ " ${php_version} " ]]; then
         echo "ERROR: unsupported PHP version ${php_version}. Aborting ..."
@@ -69,15 +68,7 @@ configurePhpVersion() {
     fi
 
    # Register php config path Docker env variable
-   if [[ "$php_version" == 'php7' ]]; then
-        php_config_path="/etc/php/7.0"
-   else
-       if [[ "$php_version" == 'php71' ]]; then
-          php_config_path="/etc/php/7.1"
-       else
-          php_config_path="/etc/php5"
-       fi
-   fi
+   php_config_path="/etc/php5"
 
    if grep -q DOCKER_PHP_CONF_PATH "$DOCKER_COMPOSE_CONFIG_FILE"; then
      sed -i '/DOCKER_PHP_CONF_PATH/c\export DOCKER_PHP_CONF_PATH='$php_config_path "$DOCKER_COMPOSE_CONFIG_FILE" ;
@@ -90,9 +81,7 @@ configurePhpVersion() {
 }
 
 configureWebServer() {
-    source $DOCKER_COMPOSE_CONFIG_FILE
-    read -p "[?] Which web server do you want to use? [apache] or nginx: " web_server_type
-    web_server_type=${web_server_type:-apache}
+    web_server_type=nginx
 
     if [[ ! " ${available_web_servers[@]} " =~ " ${web_server_type} " ]]; then
         echo "ERROR: unsupported web server ${web_server_type}. Aborting ..."
@@ -140,58 +129,22 @@ buildDockerComposeConfigFileIfNeeded() {
 
         echo "Generating config file $DOCKER_COMPOSE_CONFIG_FILE ...";
 
-        read -p "[?] What is your main project name? " DOCKER_PROJECT_NAME
-        DOCKER_PROJECT_NAME=${DOCKER_PROJECT_NAME:-myproject}
+        DOCKER_PROJECT_NAME=movistar_originales
 
-        read -p "[?] Will you use this docker stack for only one project? y/[n]: " site_project
-        site_project=${site_project:-n}
+        # Multi site stack
+        read -p "[?] En qué carpeta están los archivos del proyecto? [/home/$(whoami)/www]: " www_root
+        www_root=${www_root:-/home/$(whoami)/www}
 
-        if [ "$site_project" = "y" ]
-        then
-            # Unique site stack
-            www_root="./site/"
-            www_dest="/var/www/site/"
-
-            # Check if site folder exists, otherwise clone project into site folder
-            if [ ! -d 'site' ]
-            then
-                #echo "'site' folder does not exist, remember to clone your project in there"
-
-                # In order to make this better than just letting the dev run git clone, we should check many more things...
-                # F.e. build the git url automatically using the Git repo if the given url is not full.
-                read -p "[?] 'site' folder does not exist. Please type the Git full url to clone your project: " git_url
-                git ls-remote "$git_url" &>-
-                if [ "$?" -ne 0 ]; then
-                    echo "ERROR: invalid or empty git repository. Aborting ..."
-                    exit 1;
-                fi
-
-                git clone $git_url site
-            fi
-
-        else
-            # Multi site stack
-            read -p "[?] Full path of your projects on your host machine [/home/$(whoami)/www]: " www_root
-            www_root=${www_root:-/home/$(whoami)/www}
-
-            if [ ! -d "$www_root" ]; then
-        		echo "Root directory $www_root does not exist! Aborting ..."
-        		exit ;
-        	fi
-
-            www_dest="/var/www"
+        if [ ! -d "$www_root" ]; then
+            echo "Root directory $www_root does not exist! Aborting ..."
+            exit ;
         fi
 
-        # Ask for storage mountpoints
-        read -p "[?] Path to your ezpublish storages on host [/mnt/\$USER]: " storage_local_path
-        storage_local_path=${storage_local_path:-/mnt/\$USER}
-
-        echo "Your local storage folder will be mounted in '/mnt/$USER' inside containers"
-        echo "(Don't forget to symlink your storage in your ez5 instance after first run)"
+        www_dest="/var/www/$DOCKER_PROJECT_NAME/current"
 
         # Ask for timezone for docker args (needs docker-compsoe v2 format)
-        read -p "[?] Current timezone [Europe/Paris]: " timezone
-        timezone=${timezone:-Europe/Paris}
+        read -p "[?] Current timezone [Europe/Madrid]: " timezone
+        timezone=${timezone:-Europe/Madrid}
 
         echo "Writing timezone to PHP config ..."
         echo -e "[Date]\ndate.timezone=$timezone" > config/cli/php5/timezone.ini
@@ -202,19 +155,12 @@ buildDockerComposeConfigFileIfNeeded() {
         read -p "[?] Path to Varnish vcl file [./config/varnish/ez54.vcl]: " vcl_filepath
         vcl_filepath=${vcl_filepath:-./config/varnish/ez54.vcl}
 
-        # Ask for custom solr conf folder path
-        read -p "[?] Path to solr configuration folder [./config/solr]: " solr_conf_path
-        solr_conf_path=${solr_conf_path:-./config/solr}
-
         # Save all env vars in a file that will be included at every call
         echo "# in this file we define all env variables used by docker-compose.yml" > $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_WWW_ROOT=$www_root" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_WWW_DEST=$www_dest" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_PROJECT_NAME=$DOCKER_PROJECT_NAME" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_VARNISH_VCL_FILE=$vcl_filepath" >> $DOCKER_COMPOSE_CONFIG_FILE
-        echo "export DOCKER_SOLR_CONF_PATH=$solr_conf_path" >> $DOCKER_COMPOSE_CONFIG_FILE
-        echo "export DOCKER_STORAGE_LOCAL_PATH=$storage_local_path" >> $DOCKER_COMPOSE_CONFIG_FILE
-        echo "export DOCKER_STORAGE_MOUNT_POINT=/mnt/\$USER" >> $DOCKER_COMPOSE_CONFIG_FILE
 
         #Configure PHP version
         configurePhpVersion
