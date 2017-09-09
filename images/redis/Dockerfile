@@ -3,20 +3,19 @@ FROM ubuntu:xenial
 
 # Install Redis.
 RUN \
+  apt-get update && \
+  apt-get install -y curl gcc make vim && \
   cd /tmp && \
-  wget http://download.redis.io/redis-stable.tar.gz && \
-  tar xvzf redis-stable.tar.gz && \
+  curl -O http://download.redis.io/redis-stable.tar.gz && \
+  tar xzvf redis-stable.tar.gz && \
   cd redis-stable && \
   make && \
   make install && \
-  cp -f src/redis-sentinel /usr/local/bin && \
-  mkdir -p /etc/redis && \
-  cp -f *.conf /etc/redis && \
-  rm -rf /tmp/redis-stable* && \
-  sed -i 's/^\(bind .*\)$/# \1/' /etc/redis/redis.conf && \
-  sed -i 's/^\(daemonize .*\)$/# \1/' /etc/redis/redis.conf && \
-  sed -i 's/^\(dir .*\)$/# \1\ndir \/data/' /etc/redis/redis.conf && \
-  sed -i 's/^\(logfile .*\)$/# \1/' /etc/redis/redis.conf
+  mkdir /etc/redis && \
+  cp /tmp/redis-stable/redis.conf /etc/redis
+
+RUN sed -i -e"s/supervised no/supervised systemd/g" /etc/redis/redis.conf && \
+  sed -i -e"s/dir .\//dir \/var\/lib\/redis/g" /etc/redis/redis.conf
 
 # Define mountable directories.
 VOLUME ["/data"]
