@@ -10,7 +10,6 @@ LABEL varnish.version=5 \
 ENV TERM xterm-color
 
 ARG DOCKER_TIMEZONE=Europe/Madrid
-ARG PROJECT_NAME
 
 # Base packages
 # -----------------------------------------------------------------------------
@@ -26,6 +25,7 @@ RUN apt-get update && \
 
 # Configure timezone
 # -----------------------------------------------------------------------------
+RUN cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
 # varnish

@@ -12,5 +12,8 @@ RUN apt-get update && \
     apt-transport-https \
     mysql-client
 
+RUN cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
+
 EXPOSE 80
 EXPOSE 81
