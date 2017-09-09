@@ -1,4 +1,4 @@
-# Front web server
+# Back web server
 
 This container runs the front container in the cocktail
 
@@ -8,7 +8,6 @@ The main software packages installed are:
 
 * Nginx 1.2
 * PHP 7.1
-* Varnish 5
 
 ## Nginx config
 
@@ -30,7 +29,7 @@ You can run the container with the docker run command :
 
 
 	``` sh
-    docker run crevillo/front
+    docker run crevillo/back
     ```
 
  But is is strongly recommended to use docker-compose with the stack.sh script provided in [ezdocker-stack](https://github.com/kaliop/ezdocker-stack/) repository.
