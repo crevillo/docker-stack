@@ -37,13 +37,14 @@ RUN curl -s https://packagecloud.io/install/repositories/varnishcache/varnish5/s
 
 COPY etc/default/varnish /etc/default/varnish
 COPY etc/default/varnishncsa /etc/default/varnishncsa
-# Fix user group for varnishncsa.pid
-#COPY etc/init.d/varnishncsa /etc/init.d/varnishncsa
 
 RUN echo "varnish:CacheMeIfYouCan" > /etc/varnish/agent_secret
 
-COPY bootstrap.sh /root/bootstrap.sh
+COPY bootstrap.sh /root/bootstrap.sj
 RUN chmod 755 /root/bootstrap.sh
+
+# create site vhost
+COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$DOCKER_PROJECT_NAME
 
 # Clear archives in apt cache folder
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
