@@ -1,42 +1,25 @@
-FROM debian:jessie
-MAINTAINER Kaliop
+FROM ubuntu:xenial
+MAINTAINER The Cocktail
 LABEL php.version=7.1
 
-# Base packages
-# -----------------------------------------------------------------------------
-RUN apt-get update && \
-    apt-get install -y apt-transport-https ca-certificates wget
+# Fixes some weird terminal issues such as broken clear / CTRL+L
+ENV TERM=linux
 
-# Adding packages.sury.org repository for PHP 7
-RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ jessie main" > /etc/apt/sources.list.d/php.list
+# Install Ondrej repos for Ubuntu Xenial, PHP7.1, composer and selected extensions
+RUN echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main" > /etc/apt/sources.list.d/ondrej-php.list \
+    && echo "deb http://ppa.launchpad.net/ondrej/php-qa/ubuntu xenial main" > /etc/apt/sources.list.d/ondrej-php-qa.list \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C \
+    && apt-get update \
+    && apt-get -y --no-install-recommends install curl ca-certificates \
+        php7.1-cli php7.1-curl php7.1-imagick php7.1-mbstring \
+        php7.1-json php7.1-opcache php7.1-readline php7.1-xml php7.1-zip \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* ~/.composer
 
+CMD ["php", "-a"]
 
-# PHP packages
-# -----------------------------------------------------------------------------
-RUN apt-get update && \
-    apt-get install -y \
-    php7.1 \
-    php7.1-cli \
-    php7.1-mysqlnd \
-    php7.1-mcrypt \
-    php7.1-imagick \
-    php7.1-curl \
-    php7.1-xmlrpc \
-    php7.1-gd \
-    php7.1-json \
-    php7.1-intl \
-    php7.1-pgsql \
-    php7.1-xsl \
-    php7.1-memcached \
-    php7.1-ldap \
-    php7.1-xdebug \
-    php7.1-sqlite3
-
-# Disable xdebug
-RUN rm /etc/php/7.1/cli/conf.d/20-xdebug.ini
-
-# Clear archives in apt cache folder
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-ENTRYPOINT ["/bin/bash"]
+# If you'd like to be able to use this container on a docker-compose environment as a quiescent PHP CLI container
+# you can /bin/bash into, override CMD with the following - bear in mind that this will make docker-compose stop
+# slow on such a container, docker-compose kill might do if you're in a hurry
+# CMD ["tail", "-f", "/dev/null"]
