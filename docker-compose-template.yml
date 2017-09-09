@@ -9,8 +9,8 @@
 version: '2'
 services:
     front1:
-        image: crevillo/nginx_${DOCKER_PHP_VERSION}
-        hostname: ${DOCKER_PROJECT_NAME}_dev
+        image: crevillo/front
+        hostname: ${DOCKER_PROJECT_NAME}_front1
         container_name: front1
         privileged: true
         volumes:
@@ -31,3 +31,22 @@ services:
             - docker-compose.env.local
         cap_add:
             - SYS_PTRACE
+
+    mysql:
+        image: klabs/mysql
+        hostname: ${DOCKER_PROJECT_NAME}_mysql
+        container_name: mysql
+        # nb: this prevents the image to start on some ubuntu installs because of apparmor config...
+        #privileged: true
+        ports:
+            - "3307:3306"
+        volumes:
+            - ./config/mysql/:/etc/mysql/conf.d/
+            - ./data/mysql/:/var/lib/mysql
+            - ./logs/mysql/:/var/log/mysql
+        env_file:
+            - docker-compose.env
+            - docker-compose.env.local
+        cap_add:
+            - SYS_PTRACE
+        command: ["/root/bootstrap.sh", "mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci"]
