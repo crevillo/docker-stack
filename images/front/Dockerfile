@@ -10,6 +10,7 @@ LABEL varnish.version=5 \
 ENV TERM xterm-color
 
 ARG DOCKER_TIMEZONE=Europe/Madrid
+ARG project_name
 
 # Base packages
 # -----------------------------------------------------------------------------
@@ -44,7 +45,8 @@ COPY bootstrap.sh /root/bootstrap.sj
 RUN chmod 755 /root/bootstrap.sh
 
 # create site vhost
-COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$DOCKER_PROJECT_NAME
+COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$project_name
+COPY etc/nginx/sites-enabled/proxy_back /etc/nginx/sites-enabled/proxy_back
 
 # Clear archives in apt cache folder
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
