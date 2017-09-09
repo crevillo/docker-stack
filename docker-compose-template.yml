@@ -7,12 +7,16 @@
 # 'docker' commands.
 # Keeping a separate container name for each project allows to run many container platforms in parallel
 version: '2'
+networks:
+    default:
+        external:
+            name: ${DOCKER_NETWORK_NAME}
 services:
     web:
         extends:
             file: ${DOCKER_WEB_SERVER}.yml
             service: ${DOCKER_WEB_SERVER}
-        hostname: ${DOCKER_PROJECT_NAME}_web
+        hostname: web.${DOCKER_NETWORK_NAME}
         container_name: web
         ports:
             - "82:82"
@@ -24,9 +28,11 @@ services:
             - docker-compose.env.local
         cap_add:
             - SYS_PTRACE
+        networks:
+            - default
     front1:
         image: crevillo/front
-        hostname: front1.${DOCKER_PROJECT_NAME}.cloud
+        hostname: front1.${DOCKER_NETWORK_NAME}
         container_name: front1
         privileged: true
         volumes:
@@ -46,9 +52,11 @@ services:
             - docker-compose.env.local
         cap_add:
             - SYS_PTRACE
+        networks:
+            - default
     back1:
         image: crevillo/back
-        hostname: back1.${DOCKER_PROJECT_NAME}.cloud
+        hostname: back1.${DOCKER_NETWORK_NAME}
         container_name: back1
         privileged: true
         volumes:
@@ -68,10 +76,11 @@ services:
             - docker-compose.env.local
         cap_add:
             - SYS_PTRACE
-
+        networks:
+            - default
     db:
         image: klabs/mysql
-        hostname: db.${DOCKER_PROJECT_NAME}.cloud
+        hostname: db.${DOCKER_NETWORK_NAME}
         container_name: db
         # nb: this prevents the image to start on some ubuntu installs because of apparmor config...
         #privileged: true
@@ -87,12 +96,16 @@ services:
         cap_add:
             - SYS_PTRACE
         command: ["/root/bootstrap.sh", "mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci"]
-
+        networks:
+            - default
     redis:
         image: crevillo/redis
-        hostname: redis.${DOCKER_PROJECT_NAME}.cloud
+        hostname: redis.${DOCKER_NETWORK_NAME}
         container_name: redis
         ports:
             - "6379:6379"
         cap_add:
             - SYS_PTRACE
+        networks:
+            - default
+

@@ -51,6 +51,7 @@ buildDockerComposeLocalEnvFileIfNeeded() {
     fi
 }
 
+
 configurePhpVersion() {
     php_version=7.1
 
@@ -132,7 +133,9 @@ buildDockerComposeConfigFileIfNeeded() {
         read -p "[?] Cómo se llama el proyecto? " DOCKER_PROJECT_NAME
         DOCKER_PROJECT_NAME=${DOCKER_PROJECT_NAME:-myproject}
 
-        # Multi site stack
+        read -p "[?] Cómo quieres que se llame la red? [$DOCKER_PROJECT_NAME] " network_name
+        DOCKER_NETWORK_NAME=${network_name:-${DOCKER_PROJECT_NAME}}
+
         read -p "[?] Dónde tienes los archivos? [/home/$(whoami)/www]: " www_root
         www_root=${www_root:-/home/$(whoami)/www}
 
@@ -161,11 +164,22 @@ buildDockerComposeConfigFileIfNeeded() {
         echo "export DOCKER_WWW_ROOT=$www_root" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_WWW_DEST=$www_dest" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_PROJECT_NAME=$DOCKER_PROJECT_NAME" >> $DOCKER_COMPOSE_CONFIG_FILE
+        echo "export DOCKER_NETWORK_NAME=$DOCKER_NETWORK_NAME" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_VARNISH_VCL_FILE=$vcl_filepath" >> $DOCKER_COMPOSE_CONFIG_FILE
         #Configure PHP version
         configurePhpVersion
         configureWebServer
     fi
+}
+
+buildNetwork() {
+    echo "Creando network $DOCKER_NETWORK_NAME"
+    docker network create --driver=bridge --subnet=10.0.0.0/21 $DOCKER_NETWORK_NAME
+}
+
+destroyNetwork() {
+    echo "Destruyendo network $DOCKER_NETWORK_NAME"
+    docker network rm $DOCKER_NETWORK_NAME
 }
 
 purgeLogs() {
@@ -181,7 +195,6 @@ update() {
 }
 
 # ### Live code starts here ###
-
 buildDockerComposeFile
 buildDockerComposeConfigFileIfNeeded
 buildDockerComposeLocalEnvFileIfNeeded
@@ -193,6 +206,8 @@ source $DOCKER_COMPOSE_CONFIG_FILE
 case "$1" in
 
     start|run)
+        buildNetwork
+
         if [ ! $DOCKER_PHP_VERSION ]; then
            configurePhpVersion
         fi
@@ -209,6 +224,7 @@ case "$1" in
 
     stop)
         $DOCKER_COMPOSE -p "$DOCKER_PROJECT_NAME" stop
+        destroyNetwork
         ;;
 
     rm)
