@@ -10,9 +10,6 @@ LABEL varnish.version=5 \
 ENV TERM xterm-color
 
 ARG DOCKER_TIMEZONE=Europe/Madrid
-ARG DOCKER_PROJECT_NAME
-
-ENV PROJECT_NAME $DOCKER_PROJECT_NAME
 
 # Base packages
 # -----------------------------------------------------------------------------
@@ -51,13 +48,11 @@ RUN chmod 755 /root/front_bootstrap.sh
 COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/site
 COPY etc/nginx/sites-enabled/proxy_back /etc/nginx/sites-enabled/proxy_back
 
+CMD ["/root/front_bootstrap.sh"]
+
 # Clear archives in apt cache folder
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 6081
-EXPOSE 6082
 EXPOSE 443
-EXPOSE 80
 EXPOSE 81
-
-CMD ["/root/front_bootstrap.sh"]

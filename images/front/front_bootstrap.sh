@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # modify nginx vhost
-service nginx stop
 
 mv /etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$PROJECT_NAME
-sed -i -e "s/{{ project_name }}/$PROJECT_NAME/g" /etc/nginx/sites-enabled/$PROJECT_NAME
+sed -i -e "s/{{ project_name }}/$PROJECT_NAME/g" /etc/nginx/sites-enabled/movistar_originales
+sed -i -e "s/{{ project_name }}/$PROJECT_NAME/g" /etc/nginx/sites-enabled/proxy_back
 
-#service nginx restart
-#service php7.1-fpm restart
+service nginx restart
+service php7.1-fpm start
 
 echo  [`date`] Bootstrapping Varnish...
 
@@ -30,3 +30,7 @@ service varnish start
 sleep 2
 
 echo [`date`] Bootstrap finished
+
+tail -f /dev/null &
+child=$!
+wait "$child"

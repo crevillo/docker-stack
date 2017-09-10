@@ -1,8 +1,6 @@
-FROM crevillo/nginx_php71
+FROM crevillo/php71
 MAINTAINER The Cocktail
-LABEL varnish.version=5 \
-      nginx.version=1.2 \
-      php.version=7.1 \
+LABEL php.version=7.1 \
       application.type=PHP
 
 # Add mysql client
@@ -16,10 +14,6 @@ RUN apt-get update && \
 RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
-COPY bootstrap.sh /root/bootstrap.sh
-RUN chmod 755 /root/bootstrap.sh
-
-EXPOSE 80
-EXPOSE 81
+EXPOSE 9000
 
 CMD ["/root/bootstrap.sh"]
