@@ -12,7 +12,7 @@ ENV TERM xterm-color
 ARG DOCKER_TIMEZONE=Europe/Madrid
 ARG DOCKER_PROJECT_NAME
 
-ENV PROJECT_NAME=$DOCKER_PROJECT_NAME
+ENV PROJECT_NAME $DOCKER_PROJECT_NAME
 
 # Base packages
 # -----------------------------------------------------------------------------
