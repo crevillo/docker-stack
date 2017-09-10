@@ -1,9 +1,8 @@
 ## UPSTREAM
 
-resolver nginx_resolver;
 upstream php_fpm_production {
-      jdomain back.movistar.cloud port=8000;
-  }
+      server back1.movistar.cloud;
+}
 
 server {
     listen 81;
@@ -13,13 +12,13 @@ server {
     error_page 500 502 504 /500.html;
     error_page 503 @503;
 
-            server_name *.dev.{{ project_name }}
+            server_name *.dev.{{ project_name }};
 
-    root /var/www/movistar_originales/current/web;
+    root /var/www/{{ project_name }}/current/web;
 
     include redirects/*.conf;
 
-    access_log /var/log/nginx/proxy_back.access.log timed_combined;
+    access_log /var/log/nginx/proxy_back.access.log;
     error_log /var/log/nginx/proxy_back.error.log;
 
     # INCLUDE EZ REWRITE RULES

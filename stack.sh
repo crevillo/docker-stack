@@ -16,7 +16,7 @@ php_available_versions=(7.1)
 available_web_servers=(nginx)
 
 usage() {
-    echo "Usage: ./stack.sh start|stop|rm|php_switch|web_server_switch|purgelogs|update|reset"
+    echo "Usage: ./stack.sh start|stop|rm|php_switch|web_server_switch|purgelogs|update|reset|recreate"
 }
 
 # copy template yml file to final docker-compose.yml file
@@ -225,6 +225,23 @@ case "$1" in
         #Always pull latest images from Docker hub
         $DOCKER_COMPOSE pull
         $DOCKER_COMPOSE -p "$DOCKER_PROJECT_NAME" up -d
+        ;;
+
+    recreate)
+        buildNetwork
+
+        if [ ! $DOCKER_PHP_VERSION ]; then
+           configurePhpVersion
+        fi
+
+        if [ ! $DOCKER_WEB_SERVER ]; then
+           configureWebServer
+        fi
+
+        $DOCKER_COMPOSE -p "$DOCKER_PROJECT_NAME" down
+        #Always pull latest images from Docker hub
+        $DOCKER_COMPOSE pull
+        $DOCKER_COMPOSE -p "$DOCKER_PROJECT_NAME" build
         ;;
 
     stop)

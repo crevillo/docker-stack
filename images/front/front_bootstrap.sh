@@ -1,12 +1,13 @@
 #!/bin/bash
 
-PROJECT_NAME=${PROJECT_NAME}
 # modify nginx vhost
+service nginx stop
+
 mv /etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$PROJECT_NAME
 sed -i -e "s/{{ project_name }}/$PROJECT_NAME/g" /etc/nginx/sites-enabled/$PROJECT_NAME
 
-service nginx start
-service php7.1-fpm start
+#service nginx restart
+#service php7.1-fpm restart
 
 echo  [`date`] Bootstrapping Varnish...
 

@@ -34,11 +34,26 @@ ENV LC_ALL $DOCKER_LOCALE
 ENV LANG $DOCKER_LOCALE
 ENV LANGUAGE $DOCKER_LOCALE
 
-# Install Nginx & PHP
-# -----------------------------------------------------------------------------
+# some utils
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    nginx \
-    php7.1-fpm
+    software-properties-common python-software-properties
+
+# add nginx repo
+RUN add-apt-repository -y ppa:nginx/stable
+
+# add deb-src
+RUN sed -ie "s/# deb-src/deb-src/g" /etc/apt/sources.list.d/nginx-ubuntu-stable-xenial.list
+
+RUN sudo apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    dpkg-dev
+
+RUN mkdir /opt/rebuildnginx && cd /opt/rebuildnginx
+
+# Get Nginx (ppa:nginx/stable) source files
+RUN sudo apt-get source nginx
+
+# Install the build dependencies
+RUN sudo apt-get build-dep nginx
 
 # Local user
 # => to try : run container with --user option to set root user id with host user id
