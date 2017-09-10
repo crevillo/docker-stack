@@ -17,3 +17,5 @@ RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
 EXPOSE 9000
+
+CMD ["/bin/bash"]
