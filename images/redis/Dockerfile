@@ -6,7 +6,7 @@ ARG DOCKER_TIMEZONE=Europe/Madrid
 # Install Redis.
 RUN \
   apt-get update && \
-  apt-get install -y curl gcc make vim && \
+  apt-get install -y curl gcc make vim tzdata && \
   cd /tmp && \
   curl -O http://download.redis.io/redis-stable.tar.gz && \
   tar xzvf redis-stable.tar.gz && \
