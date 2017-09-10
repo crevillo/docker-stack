@@ -10,7 +10,8 @@ LABEL varnish.version=5 \
 RUN apt-get update && \
     apt-get install -y \
     apt-transport-https \
-    mysql-client
+    mysql-client \
+    git
 
 RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
