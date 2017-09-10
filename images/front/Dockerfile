@@ -54,5 +54,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 6081
 EXPOSE 6082
+EXPOSE 443
+EXPOSE 80
+EXPOSE 81
 
 CMD ["/root/bootstrap.sh"]

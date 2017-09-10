@@ -2,6 +2,7 @@
 
 # modify nginx vhost
 mv /etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$DOCKER_PROJECT_NAME
+sed -e "s/\{\{ project_name \}\}/$DOCKER_PROJECT_NAME/g" /etc/nginx/sites-enabled/$DOCKER_PROJECT_NAME
 
 service nginx start
 service php7.1-fpm start

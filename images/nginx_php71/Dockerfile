@@ -88,10 +88,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY bootstrap.sh /root/bootstrap.sh
 RUN chmod 755 /root/bootstrap.sh
 
-EXPOSE 443
-EXPOSE 80
-EXPOSE 81
-
 WORKDIR /var/www/
 
 CMD ["/root/bootstrap.sh"]
