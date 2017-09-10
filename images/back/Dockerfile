@@ -11,6 +11,8 @@ RUN apt-get update && \
     mysql-client \
     git
 
+ARG DOCKER_TIMEZONE=Europe/Madrid
+
 RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
