@@ -80,7 +80,6 @@ COPY etc/nginx/sites-available/default /etc/nginx/sites-available/000-default
 RUN rm /etc/nginx/sites-enabled/default
 RUN ln -s /etc/nginx/sites-available/000-default /etc/nginx/sites-enabled/000-default
 
-COPY sites/controlpanel/ /home/site/controlpanel/
 # -----------------------------------------------------------------------------
 
 # Clear archives in apt cache folder
