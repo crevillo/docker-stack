@@ -16,5 +16,10 @@ RUN apt-get update && \
 RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
+COPY bootstrap.sh /root/bootstrap.sh
+RUN chmod 755 /root/bootstrap.sh
+
 EXPOSE 80
 EXPOSE 81
+
+CMD ["/root/bootstrap.sh"]

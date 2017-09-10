@@ -42,8 +42,8 @@ COPY etc/default/varnishncsa /etc/default/varnishncsa
 
 RUN echo "varnish:CacheMeIfYouCan" > /etc/varnish/agent_secret
 
-COPY bootstrap.sh /root/bootstrap.sh
-RUN chmod 755 /root/bootstrap.sh
+COPY front_bootstrap.sh /root/front_bootstrap.sh
+RUN chmod 755 /root/front_bootstrap.sh
 
 # create site vhost
 COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/site
@@ -58,4 +58,4 @@ EXPOSE 443
 EXPOSE 80
 EXPOSE 81
 
-CMD ["/root/bootstrap.sh"]
+CMD ["/root/front_bootstrap.sh"]
