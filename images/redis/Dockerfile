@@ -1,6 +1,8 @@
 # Pull base image.
 FROM ubuntu:xenial
 
+ARG DOCKER_TIMEZONE=Europe/Madrid
+
 # Install Redis.
 RUN \
   apt-get update && \
