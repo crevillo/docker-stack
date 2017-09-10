@@ -1,7 +1,7 @@
 ## UPSTREAM
 
 upstream php_fpm_production {
-      server back1.movistar.cloud;
+      server back1.movistar.cloud:9000;
 }
 
 server {

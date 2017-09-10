@@ -12,7 +12,7 @@ RUN echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main" > /etc/apt
     && apt-get update \
     && apt-get -y --no-install-recommends install curl ca-certificates \
         php7.1-cli php7.1-curl php7.1-imagick php7.1-mbstring \
-        php7.1-json php7.1-opcache php7.1-readline php7.1-xml php7.1-zip \
+        php7.1-json php7.1-opcache php7.1-readline php7.1-xml php7.1-zip php7.1-intl php-redis \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* ~/.composer
