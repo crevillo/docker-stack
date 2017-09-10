@@ -10,7 +10,6 @@ LABEL varnish.version=5 \
 ENV TERM xterm-color
 
 ARG DOCKER_TIMEZONE=Europe/Madrid
-ARG PROJECT_NAME
 
 # Base packages
 # -----------------------------------------------------------------------------
