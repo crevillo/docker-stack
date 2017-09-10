@@ -48,6 +48,11 @@ buildDockerComposeLocalEnvFileIfNeeded() {
 
         echo "DEV_UID=$current_uid" > docker-compose.env.local
         echo "DEV_GID=$current_gid" >> docker-compose.env.local
+
+        if  [ -f 'docker-compose.config.sh' ]; then
+            project_name=$(grep "export DOCKER_PROJECT_NAME=" docker-compose.config.sh | cut -c28-)
+            echo "PROJECT_NAME=$project_name" >> docker-compose.env.local
+        fi
     fi
 }
 
