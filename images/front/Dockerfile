@@ -26,7 +26,7 @@ RUN apt-get update && \
 
 # Configure timezone
 # -----------------------------------------------------------------------------
-RUN cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
 # varnish
@@ -42,11 +42,11 @@ COPY etc/default/varnishncsa /etc/default/varnishncsa
 
 RUN echo "varnish:CacheMeIfYouCan" > /etc/varnish/agent_secret
 
-COPY bootstrap.sh /root/bootstrap.sj
+COPY bootstrap.sh /root/bootstrap.sh
 RUN chmod 755 /root/bootstrap.sh
 
 # create site vhost
-COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$PROJECT_NAME
+COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/site
 COPY etc/nginx/sites-enabled/proxy_back /etc/nginx/sites-enabled/proxy_back
 
 # Clear archives in apt cache folder

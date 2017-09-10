@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# modify nginx vhost
+mv /etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/$DOCKER_PROJECT_NAME
+
+service nginx start
+service php7.1-fpm start
+
 echo  [`date`] Bootstrapping Varnish...
 
 function clean_up {

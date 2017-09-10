@@ -15,7 +15,7 @@ RUN \
   cp /tmp/redis-stable/redis.conf /etc/redis && \
   mkdir /var/lib/redis
 
-RUN cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
 
 RUN sed -i -e"s/supervised no/supervised systemd/g" /etc/redis/redis.conf && \
