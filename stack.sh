@@ -152,7 +152,7 @@ buildDockerComposeConfigFileIfNeeded() {
         www_dest="/var/www/$DOCKER_PROJECT_NAME/current"
 
         # Ask for timezone for docker args (needs docker-compsoe v2 format)
-        read -p "[?] Current timezone [Europe/Madrid]: " timezone
+        read -p "[?] Zona horaria [Europe/Madrid]: " timezone
         timezone=${timezone:-Europe/Madrid}
 
         echo "Writing timezone to PHP config ..."
@@ -164,6 +164,10 @@ buildDockerComposeConfigFileIfNeeded() {
         read -p "[?] Path to Varnish vcl file [./config/varnish/ez54.vcl]: " vcl_filepath
         vcl_filepath=${vcl_filepath:-./config/varnish/ez54.vcl}
 
+        # Ask for tacoma file path
+        read -p "[?] Dónde está tu fichero tacoma? [/home/$USER/.tacoma.yml] " tacoma_file
+        tacoma_file=${tacoma_file:-/home/$USER/.tacoma.yml}
+
         # Save all env vars in a file that will be included at every call
         echo "# in this file we define all env variables used by docker-compose.yml" > $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_WWW_ROOT=$www_root" >> $DOCKER_COMPOSE_CONFIG_FILE
@@ -171,9 +175,14 @@ buildDockerComposeConfigFileIfNeeded() {
         echo "export DOCKER_PROJECT_NAME=$DOCKER_PROJECT_NAME" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_NETWORK_NAME=$DOCKER_NETWORK_NAME" >> $DOCKER_COMPOSE_CONFIG_FILE
         echo "export DOCKER_VARNISH_VCL_FILE=$vcl_filepath" >> $DOCKER_COMPOSE_CONFIG_FILE
+        echo "export TACOMA_FILE=$tacoma_file" >> $DOCKER_COMPOSE_CONFIG_FILE
+        echo "export TACOMA_PROJECT=$tacoma_project" >> $DOCKER_COMPOSE_CONFIG_FILE
+        echo "export SSH_FILE=$ssh_key" >> $DOCKER_COMPOSE_CONFIG_FILE
         #Configure PHP version
         configurePhpVersion
         configureWebServer
+
+        source $DOCKER_COMPOSE_CONFIG_FILE
     fi
 }
 

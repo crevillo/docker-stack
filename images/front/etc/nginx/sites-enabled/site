@@ -10,9 +10,10 @@ server {
   error_page 500 502 504 /500.html;
   error_page 503 @503;
 
-  if ($http_x_forwarded_proto != "https") {
-      rewrite ^(.*)$ https://$host$1 permanent;
-  }
+  # comentamos siguientes líneas hasta que podamos simular aws
+  #if ($http_x_forwarded_proto != "https") {
+  #    rewrite ^(.*)$ https://$host$1 permanent;
+  #}
 
   server_name *.dev.{{ project_name }};
 

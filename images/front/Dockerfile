@@ -47,6 +47,7 @@ RUN chmod 755 /root/front_bootstrap.sh
 # create site vhost
 COPY etc/nginx/sites-enabled/site /etc/nginx/sites-enabled/site
 COPY etc/nginx/sites-enabled/proxy_back /etc/nginx/sites-enabled/proxy_back
+COPY etc/varnish/default.vcl /etc/varnish/default.vcl
 
 CMD ["/root/front_bootstrap.sh"]
 

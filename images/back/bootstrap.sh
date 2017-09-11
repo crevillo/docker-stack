@@ -32,6 +32,12 @@ echo [`date`] Starting the service...
 
 trap clean_up SIGTERM
 
+echo "env[SYMFONY_ENV]=$SYMFONY_ENV" >> /etc/php/7.1/fpm/pool.d/www.conf
+echo "env[SYMFONY_HTTP_CACHE]=$SYMFONY_HTTP_CACHE" >> /etc/php/7.1/fpm/pool.d/www.conf
+
+# copy tacoma config from user
+cp /home/$HOST_USER/.tacoma.yml /root/
+
 service php7.1-fpm start
 
 echo [`date`] Bootstrap finised

@@ -13,9 +13,13 @@ RUN apt-get update && \
     git \
     iputils-ping \
     telnet \
-    vim
+    vim \
+    python-pip \
+    rubygems \
+    curl
 
 ARG DOCKER_TIMEZONE=Europe/Madrid
+ARG HOST_USER
 
 RUN cp /usr/share/zoneinfo/$DOCKER_TIMEZONE /etc/localtime
 RUN echo $DOCKER_TIMEZONE > /etc/timezone; dpkg-reconfigure -f noninteractive tzdata
@@ -34,6 +38,7 @@ RUN addgroup --gid 1013 site && \
     cp /etc/skel/.* /home/site/; \
     chown -R site:site /home/site;
 
+# Modify conf
 RUN sed -rie 's|user = www-data|user = site|g' /etc/php/7.1/fpm/pool.d/www.conf && \
     sed -rie 's|listen.owner = www-data|listen.owner = site|g' /etc/php/7.1/fpm/pool.d/www.conf && \
     sed -rie 's|listen = /run/php/php7.1-fpm.sock|listen = 9000|g' /etc/php/7.1/fpm/pool.d/www.conf
@@ -42,6 +47,20 @@ RUN sed -rie 's|user = www-data|user = site|g' /etc/php/7.1/fpm/pool.d/www.conf 
 RUN mkdir /var/log/php/
 RUN chmod 755 -R /var/log/php/
 RUN sed -rie 's|error_log = /var/log/php7.1-fpm.log|error_log = /var/log/php/php7.1-fpm.log|g' /etc/php/7.1/fpm/php-fpm.conf
+
+
+# install tacoma
+RUN gem install tacoma
+
+# install node
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+    apt-get install -y nodejs
+
+# install yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update && apt-get install -y yarn
 
 COPY bootstrap.sh /root/bootstrap.sh
 RUN chmod 755 /root/bootstrap.sh
