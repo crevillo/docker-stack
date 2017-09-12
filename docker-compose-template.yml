@@ -16,8 +16,6 @@ services:
         image: crevillo/front
         hostname: front1.${DOCKER_NETWORK_NAME}
         container_name: front1
-        ports:
-            - "82:81"
         privileged: true
         volumes:
             - "$DOCKER_WWW_ROOT:$DOCKER_WWW_DEST"
@@ -44,8 +42,6 @@ services:
         hostname: back1.${DOCKER_NETWORK_NAME}
         container_name: back1
         privileged: true
-        ports:
-            - "83:80"
         volumes:
             - "$DOCKER_WWW_ROOT:$DOCKER_WWW_DEST"
             - ./logs/cli:/var/log/php
@@ -56,8 +52,12 @@ services:
             - "$SSH_AUTH_SOCK:/ssh-agent"
             - "./config/cli/php5/custom_vars.ini:$DOCKER_PHP_CONF_PATH/cli/conf.d/custom_vars.ini"
             - "./config/cli/php5/timezone.ini:$DOCKER_PHP_CONF_PATH/cli/conf.d/timezone.ini"
+            - "/home/$USER/.tacoma.yml:/home/site/.tacoma.yml"
+            - "$HOME/.ssh:/home/site/.ssh/"
         environment:
             - SSH_AUTH_SOCK=/ssh-agent
+            - SYMFONY_ENV=docker
+            - SYMFONY_HTTP_CACHE=0
         env_file:
             - docker-compose.env
             - docker-compose.env.local
@@ -71,8 +71,6 @@ services:
         container_name: db
         # nb: this prevents the image to start on some ubuntu installs because of apparmor config...
         #privileged: true
-        ports:
-            - "3307:3306"
         volumes:
             - ./config/mysql/:/etc/mysql/conf.d/
             - ./data/mysql/:/var/lib/mysql
@@ -89,9 +87,20 @@ services:
         image: crevillo/redis
         hostname: redis.${DOCKER_NETWORK_NAME}
         container_name: redis
-        ports:
-            - "6379:6379"
         cap_add:
             - SYS_PTRACE
         networks:
             - default
+    haproxy:
+        image: crevillo/haproxy
+        hostname: haproxy.${DOCKER_PROJECT_NAME}
+        container_name: haproxy
+        ports:
+           - "80:80"
+           - "443:443"
+        env_file:
+            - docker-compose.env
+            - docker-compose.env.local
+        depends_on:
+           - front1
+           - back1
